@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luyện từ vựng tiếng Nhật</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#f6f5f2;--surface:#fff;--surface2:#efede8;--line:#dedad3;
+  --fg:#1b1a1f;--muted:#6b6873;--accent:#d6336c;--on-accent:#fff;
+  --good:#1c8a55;--good-bg:#e3f4ea;--bad:#c4452a;--bad-bg:#fbe6df;
+  --font-ui:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --font-jp:'Noto Sans JP','Hiragino Sans','Yu Gothic','Meiryo',sans-serif;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0f0f12;--surface:#18181c;--surface2:#222228;--line:#303038;
+    --fg:#f1f0ee;--muted:#9c9aa5;--accent:#f06595;--on-accent:#1a0711;
+    --good:#4cc38a;--good-bg:#11271e;--bad:#ff7a5c;--bad-bg:#2d1912;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font-ui);padding:16px 16px 56px}
+.app{max-width:760px;margin:0 auto}
+h1,h2,h3,p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[lang="ja"]{font-family:var(--font-jp)}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:14px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;font-size:18px;display:flex;align-items:baseline;gap:8px}
+.brand .mark{color:var(--accent);font-size:24px;font-family:var(--font-jp)}
+.nav{display:flex;gap:4px}
+.nav button{background:none;border:0;padding:8px 14px;border-radius:8px;color:var(--muted);font-weight:500}
+.nav button:hover{color:var(--fg)}
+.nav button[aria-current="page"]{background:var(--surface2);color:var(--fg)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.lede{color:var(--muted);margin-top:6px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.btn{background:var(--accent);color:var(--on-accent);border:0;border-radius:10px;padding:12px 22px;font-weight:600}
+.btn:hover{filter:brightness(1.07)}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line);font-weight:500}
+.btn.ghost:hover{border-color:var(--muted);filter:none}
+.btn.small{padding:7px 12px;font-size:13px;border-radius:8px}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid var(--bad)}
+
+/* setup */
+.sets{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:18px}
+.set{text-align:left;padding:14px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.set .sn{color:var(--fg);font-weight:600}
+.set .sd{font-size:13px}
+.set .sc{font-size:12px;font-variant-numeric:tabular-nums}
+.set[aria-pressed="true"]{border-color:var(--accent);background:var(--surface2)}
+.opts{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+.opts label.check{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.opts input[type=checkbox]{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+.opts .sub{color:var(--muted);font-size:13px}
+.opts select{font:inherit;padding:9px 10px;border-radius:8px;background:var(--surface2);color:var(--fg);border:1px solid var(--line);margin-top:6px;min-width:160px}
+.warn{color:var(--bad);font-size:13px;min-height:1.2em}
+.startrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:6px}
+
+/* quiz */
+.qbar{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.qbar .count{font-variant-numeric:tabular-nums;color:var(--muted);min-width:60px}
+.bar{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .25s}
+.qcard{padding:26px 22px}
+.word{text-align:center;padding:26px 10px;background:var(--surface2);border-radius:12px}
+.jp{font-family:var(--font-jp);font-weight:700;line-height:1.25;word-break:keep-all;overflow-wrap:anywhere}
+.jp.l1{font-size:68px}.jp.l2{font-size:52px}.jp.l3{font-size:40px}.jp.l4{font-size:30px}
+.reading{font-family:var(--font-jp);color:var(--muted);font-size:18px;margin-top:8px}
+.romaji{margin-top:4px;font-size:20px;font-weight:600;color:var(--accent);letter-spacing:.02em}
+.field{margin-top:18px}
+.field label{display:block;font-weight:600;margin-bottom:6px}
+.field input{font:inherit;font-size:20px;width:100%;padding:12px 14px;border-radius:10px;background:var(--surface2);color:var(--fg);border:1.5px solid var(--line)}
+.field input:focus{outline:none;border-color:var(--accent)}
+.field input:disabled{opacity:1;-webkit-text-fill-color:var(--fg)}
+.field.ok input{border-color:var(--good);background:var(--good-bg)}
+.field.no input{border-color:var(--bad);background:var(--bad-bg)}
+.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+.hint{color:var(--muted);font-size:13px}
+.fb{margin-top:16px;padding:14px 16px;border-radius:10px;border:1px solid}
+.fb.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.fb.no{background:var(--bad-bg);border-color:var(--bad)}
+.fb .t{font-weight:700}
+.fb.no .t{color:var(--bad)}
+.fb .ans{color:var(--fg);font-size:20px;font-weight:700;margin-top:4px}
+.fb .more{color:var(--muted);font-size:13px;margin-top:4px}
+
+/* results */
+.score{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:10px}
+.score .big{font-size:60px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.score .pct{color:var(--muted);font-size:18px}
+.rowacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.wlist{margin-top:22px}
+.item{display:grid;grid-template-columns:minmax(90px,auto) 1fr;gap:14px;padding:12px 0;border-top:1px solid var(--line);align-items:center}
+.item .j{font-family:var(--font-jp);font-weight:700;font-size:22px;word-break:keep-all;overflow-wrap:anywhere}
+.item .r{color:var(--accent);font-size:13px;font-weight:600}
+.item .m{font-size:15px}
+.item .m small{display:block;color:var(--muted)}
+.bad-text{color:var(--bad)}
+.good-text{color:var(--good)}
+.empty{color:var(--muted);margin-top:14px}
+
+/* list */
+.search{width:100%;font:inherit;font-size:16px;padding:11px 14px;border-radius:10px;background:var(--surface);color:var(--fg);border:1.5px solid var(--line);margin:16px 0 8px}
+.search:focus{outline:none;border-color:var(--accent)}
+.tag{font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-left:6px;white-space:nowrap}
+.tag.w{color:var(--bad);border-color:var(--bad)}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><span class="mark" lang="ja">日本語</span><span>Luyện từ vựng</span></div>
+    <nav class="nav" aria-label="Điều hướng">
+      <button type="button" id="nav-practice" data-act="goto" data-v="setup">Luyện tập</button>
+      <button type="button" id="nav-list" data-act="goto" data-v="list">Danh sách từ</button>
+    </nav>
+  </header>
+  <main id="view"></main>
+</div>
+
+<script>
+// ==LOGIC-START==
+/* Mỗi dòng: bộ | chữ Nhật | cách đọc (để trống nếu giống chữ Nhật) | nghĩa chính | các nghĩa khác chấp nhận (cách nhau bằng ;)
+   Muốn thêm từ mới: copy một dòng và sửa. Bộ: b1, dt, dg, b2 (có thể ghi nhiều bộ: b1,b2). */
+const SETS = [
+  { id: 'b1', n: 'Bài 1 · Từ vựng', d: 'Quốc gia, nghề nghiệp, trường học, thể thao, sở thích' },
+  { id: 'dt', n: 'Danh từ', d: 'Thời gian, địa điểm, lễ hội, mùa, đồ ăn, thiết bị' },
+  { id: 'dg', n: 'Động từ', d: 'Đi, đến, ăn, uống, đọc, học, làm việc...' },
+  { id: 'b2', n: 'Bài 2 · Từ vựng', d: 'Cửa hàng, đồ vật, đồ ăn, đồ uống, quốc gia' }
+];
+
+const RAW = `
+b1|にほん||Nhật Bản|nhật;nhat ban;japan
+b1|かんこく||Hàn Quốc|hàn;korea
+b1|ちゅうごく||Trung Quốc|trung;trung hoa;china
+b1|タイ||Thái Lan|thái;thailand
+b1|ベトナム||Việt Nam|việt;vn;vietnam
+b1|オーストラリア||Úc|australia;nước úc
+b1|アメリカ||Mỹ|hoa kỳ;america;usa;nước mỹ
+b1|イタリア||Ý|italy;nước ý;italia
+b1|ロシア||Nga|russia;nước nga
+b1,b2|インド||Ấn Độ|india
+b1|ブラジル||Brazil|braxin;bra-xin;brasil
+b1|しごと||công việc|việc làm;nghề nghiệp;nghề;công tác
+b1|きょうし||giáo viên|thầy giáo;cô giáo;giảng viên;nhà giáo
+b1|かいしゃいん||nhân viên văn phòng|nhân viên công ty;nhân viên;nhân viên công ti
+b1|がくせい||học sinh|sinh viên;học trò;học sinh sinh viên
+b1|せんせい||thầy/cô|thầy;cô;thầy cô;thầy giáo;cô giáo;giáo viên;giảng viên
+b1|だいがく||trường đại học|đại học;university;trường đh
+b1|こうこう||trường cấp ba|cấp ba;cấp 3;trường cấp 3;trung học phổ thông;thpt;trường thpt;trường trung học phổ thông;high school;phổ thông trung học
+b1|にほんごがっこう||trường tiếng Nhật|trường nhật ngữ;nhật ngữ;trường dạy tiếng nhật;trường học tiếng nhật;trung tâm tiếng nhật
+b1|たんじょうび||sinh nhật|ngày sinh;ngày sinh nhật;birthday
+b1|スポーツ||thể thao|sport;sports;môn thể thao
+b1|テニス||tennis|quần vợt;ten-nít;tenis;môn tennis
+b1|すいえい||bơi lội|bơi;môn bơi;swimming
+b1|サッカー||bóng đá|đá bóng;soccer;football;môn bóng đá
+b1|えいが||phim ảnh|phim;điện ảnh;movie;bộ phim;xem phim
+b1|どくしょ||đọc sách|việc đọc sách;đọc;độc thư
+b1|おんがく||âm nhạc|nhạc;music
+b1|りょこう||du lịch|chuyến du lịch;đi du lịch;travel;chuyến đi
+b1,b2|りょうり||nấu ăn / món ăn|nấu ăn;món ăn;nấu nướng;đồ ăn;thức ăn;ẩm thực;cooking;món;nấu;nấu cơm
+
+dt|あさ||buổi sáng|sáng
+dt|ひる||buổi trưa|trưa;ban ngày
+dt|よる・ばん|よる・ばん|buổi tối|tối;đêm;ban đêm;buổi đêm
+dt|ごぜん||buổi sáng (AM)|sáng;buổi sáng;am;trước trưa;trước 12 giờ trưa
+dt|ごご||buổi chiều (PM)|chiều;buổi chiều;pm;sau trưa;sau 12 giờ trưa
+dt|ぎんこう||ngân hàng|bank
+dt|たいいくかん||nhà thi đấu|nhà thể dục;nhà thể thao;phòng thể dục;nhà thể chất;nhà thi đấu thể thao;phòng tập thể dục;gymnasium;nhà thể dục thể thao
+dt|としょかん||thư viện|library
+dt|びょういん||bệnh viện|hospital;nhà thương
+dt|ゆうびんきょく||bưu điện|post office;nhà bưu điện;bưu cục
+dt|きょうしつ||phòng học|lớp học;classroom;lớp
+dt|じゅぎょう||giờ học|tiết học;buổi học;bài giảng;giờ lên lớp;lớp học
+dt|テスト||bài kiểm tra|kiểm tra;test;bài thi;thi;bài test;kỳ thi;kì thi
+dt|やすみ||nghỉ / ngày nghỉ|nghỉ;ngày nghỉ;kỳ nghỉ;kì nghỉ;nghỉ ngơi;nghỉ phép;nghỉ học;giờ nghỉ;nghỉ lễ
+dt|じかん||thời gian|giờ;time;khoảng thời gian
+dt|～ようび||thứ ~|ngày thứ;thứ trong tuần;ngày trong tuần;thứ;weekday
+dt|にちようび||chủ nhật|chúa nhật;cn;sunday
+dt|げつようび||thứ hai|thứ 2;2;t2;monday
+dt|かようび||thứ ba|thứ 3;3;t3;tuesday
+dt|すいようび||thứ tư|thứ 4;4;t4;wednesday
+dt|もくようび||thứ năm|thứ 5;5;t5;thursday
+dt|きんようび||thứ sáu|thứ 6;6;t6;friday
+dt|どようび||thứ bảy|thứ 7;7;t7;saturday
+dt|スケジュール||lịch trình|lịch;kế hoạch;thời khóa biểu;lịch làm việc;schedule;thời gian biểu
+dt|アルバイト||việc làm thêm|làm thêm;công việc làm thêm;part time;part-time;bán thời gian;đi làm thêm
+dt|スキー||trượt tuyết|ski;môn trượt tuyết
+dt|パーティー||tiệc|bữa tiệc;party;buổi tiệc;tiệc tùng
+dt|バーベキュー||tiệc nướng|bbq;thịt nướng;nướng;barbecue;đồ nướng;tiệc thịt nướng;bữa tiệc nướng
+dt|はなび||pháo hoa|bắn pháo hoa;hoa lửa;fireworks;pháo bông
+dt|おはなみ||ngắm hoa anh đào|ngắm hoa;ngắm hoa đào;hanami;đi ngắm hoa;tiệc ngắm hoa
+dt|ホームステイ||homestay|ở nhà dân;home stay;ở nhà người bản xứ;ở cùng gia đình;ở trọ nhà dân
+dt|おまつり||lễ hội|festival;hội;ngày hội;matsuri;lễ hội truyền thống
+dt|うみ||biển|đại dương;bờ biển;sea;ocean
+dt|こうえん||công viên|park;vườn hoa
+dt|さくら||hoa anh đào|anh đào;hoa đào;sakura;cherry blossom
+dt|おさけ||rượu|sake;rượu sake;rượu nhật;rượu gạo;đồ uống có cồn
+dt|おすし||sushi|cơm cuộn;cơm nắm;susi
+dt|バス||xe buýt|xe bus;bus;buýt
+dt|おべんとう||cơm hộp|bento;hộp cơm;cơm bento;cơm trưa mang theo;phần cơm hộp
+dt|りゅうがくせい||du học sinh|lưu học sinh;sinh viên quốc tế
+dt|いちねん||một năm|1 năm;năm nhất;năm thứ nhất;1 year;năm đầu tiên;năm 1
+dt|春|はる|mùa xuân|xuân;spring
+dt|夏|なつ|mùa hè|hè;summer
+dt|秋|あき|mùa thu|thu;autumn;fall
+dt|冬|ふゆ|mùa đông|đông;winter
+dt|夏休み|なつやすみ|kỳ nghỉ hè|nghỉ hè;kì nghỉ hè;kỳ nghĩ hè;nghĩ hè;kỳ nghỉ mùa hè;nghỉ mùa hè;summer vacation
+dt|ゴールデンウイーク||Tuần lễ vàng|golden week;tuần vàng;kỳ nghỉ tuần lễ vàng
+dt|まいにち||mỗi ngày|hàng ngày;hằng ngày;mọi ngày;everyday;ngày nào cũng
+dt|まい～||mỗi ~|mỗi;mọi;every
+dt|あさごはん||bữa sáng|cơm sáng;ăn sáng;bữa ăn sáng;bữa điểm tâm;điểm tâm
+dt|ひるごはん||bữa trưa|cơm trưa;ăn trưa;bữa ăn trưa
+dt|ばんごはん||bữa tối|cơm tối;ăn tối;bữa ăn tối;bữa cơm tối
+dt|うち||nhà|nhà của tôi;nhà tôi;ngôi nhà;gia đình;house;home;nhà ở
+dt|コンビニ||cửa hàng tiện lợi|tiện lợi;convenience store;cửa hàng 24h;tiệm tiện lợi
+dt|かいしゃ||công ty|công ti;company;cty
+dt|がっこう||trường học|trường;school;nhà trường
+dt|ぎゅうにゅう||sữa bò|sữa;sữa tươi;milk
+dt|くだもの||trái cây|hoa quả;quả;trái;fruit
+dt|サラダ||salad|xà lách;rau trộn;gỏi;sa lát;xa lát;rau sống
+dt|チーズ||phô mai|pho mai;phomai;cheese
+dt|インターネット||internet|mạng;mạng internet;in-tơ-nét;mạng toàn cầu;net
+dt|しんぶん||báo|tờ báo;báo chí;báo giấy;newspaper;báo ngày
+dt|テレビ||tivi|ti vi;tv;truyền hình;television;vô tuyến;vô tuyến truyền hình
+dt|CD|シーディ|đĩa CD|cd;đĩa nhạc;compact disc;đĩa
+dt|DVD|ディーブイディー|đĩa DVD|dvd;đĩa phim;đĩa
+
+dg|いきます||đi|đi tới;đi đến
+dg|きます||đến|tới;đến nơi;đến đây;đi đến
+dg|かえります||về|trở về;về nhà;quay về;đi về
+dg|たべます||ăn|ăn uống;dùng bữa
+dg|のみます||uống|uống nước
+dg|みます||xem|nhìn;ngắm;coi;nhìn thấy
+dg|～します||làm ~ / chơi ~|làm;chơi;thực hiện
+dg|おきます||thức dậy|dậy;thức giấc;dậy sớm;ngủ dậy;thức
+dg|ねます||ngủ|đi ngủ;đi nằm;nằm ngủ
+dg|ききます||nghe|hỏi;lắng nghe
+dg|かいます||mua|mua sắm;mua đồ
+dg|よみます||đọc|đọc sách
+dg|べんきょうします||học|học bài;học tập;học hành;ôn bài;ôn tập
+dg|はたらきます||làm việc|đi làm;công tác;lao động;làm
+
+b2|インフォメーション||quầy thông tin|thông tin;information;quầy hướng dẫn;quầy tư vấn;quầy tiếp tân;quầy giải đáp
+b2|ATM|エーティーエム|cây ATM|atm;máy atm;máy rút tiền;máy rút tiền tự động
+b2|エスカレーター||thang cuốn|thang cuốn tự động;escalator;thang chạy
+b2|エレベーター||thang máy|elevator;lift
+b2|トイレ||toilet|nhà vệ sinh;wc;phòng vệ sinh;toa lét;cầu tiêu;nhà xí
+b2|レジ||thu ngân|quầy thu ngân;quầy tính tiền;máy tính tiền;thanh toán;register;người thu ngân;quầy thanh toán
+b2|スーパー||siêu thị|supermarket
+b2|100えんショップ|ひゃくえんショップ|cửa hàng đồng giá 100 yên|cửa hàng 100 yên;cửa hàng đồng giá;tiệm 100 yên;đồng giá 100 yên;shop 100 yên;cửa hàng một trăm yên
+b2|レストラン||nhà hàng|restaurant;quán ăn;tiệm ăn
+b2|きっさてん||quán cà phê|quán cafe;tiệm cà phê;quán nước;cafe;tiệm cafe;quán giải khát
+b2|きつえんじょ||nơi hút thuốc|khu hút thuốc;chỗ hút thuốc;phòng hút thuốc;khu vực hút thuốc;hút thuốc;smoking
+b2|ちか||dưới mặt đất|tầng hầm;hầm;dưới lòng đất;tầng ngầm;ngầm
+b2|カメラ||máy ảnh|camera;máy chụp hình;máy chụp ảnh
+b2|けいたいでんわ||điện thoại di động|điện thoại;điện thoại cầm tay;mobile;cell phone
+b2|じしょ||từ điển|dictionary
+b2|でんしじしょ||từ điển điện tử|electronic dictionary
+b2|パソコン||máy tính|máy vi tính;máy tính cá nhân;computer;pc;laptop;máy tính để bàn
+b2|くつ||giày dép|giày;dép;shoes;đôi giày
+b2|けしゴム||cục tẩy|tẩy;gôm;cục gôm;cái tẩy;eraser;gôm tẩy
+b2|ペン||bút mực|bút;pen;cây bút;bút bi;viết;cây viết;bút máy
+b2|トイレットペーパー||giấy vệ sinh|giấy toilet;toilet paper;giấy toa lét;giấy cuộn
+b2|ほん||sách|book;cuốn sách;quyển sách
+b2|あぶら||dầu|dầu ăn;oil;mỡ;dầu mỡ
+b2|ケーキ||bánh ngọt|bánh kem;bánh;cake;bánh gato
+b2|こめ||gạo|rice;lúa gạo
+b2|たまご||trứng|egg;trứng gà
+b2|パン||bánh mì|bread;bánh;bánh mỳ
+b2|みず||nước|nước uống;nước lọc;water
+b2|てんいん||nhân viên cửa hàng|nhân viên bán hàng;nhân viên;người bán hàng;nhân viên cửa tiệm;nhân viên quán
+b2|～屋|や|tiệm ~|cửa hàng ~;tiệm;cửa hàng;quán;tiệm bán ~;nhà ~;hiệu;cửa hiệu
+b2|くつや||tiệm giày|cửa hàng giày;shop giày;tiệm bán giày;hiệu giày;cửa hàng bán giày
+b2|ケーキや||tiệm bánh ngọt|tiệm bánh;cửa hàng bánh ngọt;cửa hàng bánh;tiệm bánh kem;hiệu bánh ngọt;hiệu bánh
+b2|パンや||tiệm bánh mì|cửa hàng bánh mì;hiệu bánh mì;tiệm bán bánh mì;tiệm bánh;lò bánh mì
+b2|かばん||cặp|túi;túi xách;cặp sách;balo;ba lô;bag;cái cặp;cái túi;giỏ xách
+b2|ズボン||quần|quần dài;pants;trousers;quần tây;quần âu
+b2|Ｔシャツ|ティーシャツ|áo thun|áo phông;t-shirt;áo t-shirt;áo tee;tshirt;áo thun ngắn tay
+b2|とけい||đồng hồ|clock;watch;đồng hồ đeo tay;đồng hồ treo tường;đồng hồ báo thức
+b2|イチゴ||dâu tây|dâu;strawberry;trái dâu
+b2|リンゴ||táo|apple;trái táo;táo tây;quả táo
+b2|バナナ||chuối|banana;quả chuối;trái chuối
+b2|えび||tôm|shrimp;prawn;con tôm
+b2|さかな||cá|fish;con cá
+b2|ぶたにく||thịt heo|thịt lợn;pork
+b2|とりにく||thịt gà|chicken;thịt gia cầm
+b2|ぎゅうにく||thịt bò|beef;thịt trâu bò
+b2|やさい||rau|rau củ;rau xanh;vegetable;rau quả;rau củ quả;củ quả
+b2|カレー||cà ri|curry;ca ri;món cà ri;cơm cà ri
+b2|スープ||súp|soup;canh;xúp;nước dùng;canh súp
+b2|おやこどん||cơm gà trứng|oyakodon;cơm gà và trứng;cơm gà phủ trứng;oyako don;cơm cha con;tô cơm gà trứng
+b2|とんかつ||thịt heo chiên xù|tonkatsu;thịt lợn chiên xù;cốt lết;thịt heo chiên giòn;sườn chiên xù;thịt chiên xù;thịt heo cốt lết;thịt lợn cốt lết
+b2|ハンバーグ||hamburger|hamburg;hamburg steak;thịt viên;thịt bò xay;thịt băm viên;bò viên;chả bò;bánh hamburger;bánh thịt bò
+b2|ごはん||cơm|cơm trắng;bữa ăn;bữa cơm;rice;cơm chín
+b2|ライス||cơm|cơm trắng;rice;đĩa cơm;phần cơm
+b2|（お）ちゃ|おちゃ|trà|trà xanh;tea;chè;nước trà;trà nhật;trà nóng
+b2|こうちゃ||hồng trà|trà đen;black tea;trà tây;trà túi lọc;trà hồng
+b2|コーヒー||cà phê|cafe;coffee;cà fê;caphe;cà phê đen;cà phê nóng
+b2|ジュース||nước ép|nước trái cây;nước hoa quả;juice;nước ngọt;nước quả;nước ép trái cây;nước giải khát
+b2|ビール||bia|beer;bia hơi;bia tươi
+b2|ワイン||rượu vang|wine;rượu nho;vang;vang đỏ;rượu vang đỏ
+b2|ドイツ||Đức|germany;nước đức;đức quốc
+b2|フランス||Pháp|france;nước pháp;pháp quốc
+b2|さいふ||ví|ví tiền;bóp;bóp tiền;wallet;ví da;cái ví
+b2|えいご||tiếng Anh|english;anh ngữ;anh văn;môn tiếng anh;môn anh văn
+`;
+
+/* ---------- kana -> romaji ---------- */
+const SYL = {};
+('あ:a い:i う:u え:e お:o か:ka き:ki く:ku け:ke こ:ko さ:sa し:shi す:su せ:se そ:so ' +
+ 'た:ta ち:chi つ:tsu て:te と:to な:na に:ni ぬ:nu ね:ne の:no は:ha ひ:hi ふ:fu へ:he ほ:ho ' +
+ 'ま:ma み:mi む:mu め:me も:mo や:ya ゆ:yu よ:yo ら:ra り:ri る:ru れ:re ろ:ro わ:wa を:o ん:n ' +
+ 'が:ga ぎ:gi ぐ:gu げ:ge ご:go ざ:za じ:ji ず:zu ぜ:ze ぞ:zo だ:da ぢ:ji づ:zu で:de ど:do ' +
+ 'ば:ba び:bi ぶ:bu べ:be ぼ:bo ぱ:pa ぴ:pi ぷ:pu ぺ:pe ぽ:po ゔ:vu')
+  .split(' ').forEach(p => { const [k, v] = p.split(':'); SYL[k] = v; });
+const SMY = { 'ゃ': 'ya', 'ゅ': 'yu', 'ょ': 'yo' };
+const SMV = { 'ぁ': 'a', 'ぃ': 'i', 'ぅ': 'u', 'ぇ': 'e', 'ぉ': 'o' };
+function toHira(s) { return s.replace(/[\u30A1-\u30F6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60)); }
+function toRomaji(str) {
+  const s = toHira(str);
+  let out = '', gem = false, i = 0;
+  while (i < s.length) {
+    const c = s[i], n = s[i + 1];
+    if (c === 'っ') { gem = true; i++; continue; }
+    if (c === 'ー') { const m = out.match(/[aiueo]$/); out += m ? m[0] : '-'; i++; continue; }
+    if (c === '・') { out += ' / '; i++; continue; }
+    if (SMV[c]) { out += SMV[c]; i++; continue; }
+    if (SYL[c]) {
+      let r = SYL[c], adv = 1;
+      if (n && SMY[n]) {
+        const y = SMY[n];
+        if (r === 'shi') r = 'sh' + y.slice(1);
+        else if (r === 'chi') r = 'ch' + y.slice(1);
+        else if (r === 'ji') r = 'j' + y.slice(1);
+        else r = r.slice(0, -1) + y;
+        adv = 2;
+      } else if (n && SMV[n]) {
+        const v = SMV[n];
+        if (c === 'て') { r = 't' + v; adv = 2; }
+        else if (c === 'で') { r = 'd' + v; adv = 2; }
+        else if (c === 'ふ') { r = 'f' + v; adv = 2; }
+        else if (c === 'う') { r = 'w' + v; adv = 2; }
+        else if (c === 'し' && v === 'e') { r = 'she'; adv = 2; }
+        else if (c === 'ち' && v === 'e') { r = 'che'; adv = 2; }
+        else if (c === 'じ' && v === 'e') { r = 'je'; adv = 2; }
+      }
+      if (gem) { r = r.startsWith('ch') ? 't' + r : r[0] + r; gem = false; }
+      out += r; i += adv; continue;
+    }
+    gem = false;
+    out += (c === '～' ? '~' : c.toLowerCase());
+    i++;
+  }
+  return out;
+}
+
+/* ---------- so khớp nghĩa tiếng Việt ---------- */
+// Bỏ dấu, bỏ khoảng trắng và ký tự lạ, coi y = i (kỳ/kì), nên gõ có dấu hay không dấu đều được.
+function key(s) {
+  return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/đ/g, 'd').replace(/y/g, 'i').replace(/[^a-z0-9]/g, '');
+}
+const ITEMS = RAW.trim().split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+  const [sets, jp, kana, vi, alts = ''] = l.split('|');
+  const rd = kana || jp;
+  const altList = alts.split(';').map(x => x.trim()).filter(Boolean);
+  const keys = new Set([key(vi)]);
+  vi.split(/[,;\/]/).forEach(t => { const k = key(t); if (k) keys.add(k); });
+  altList.forEach(a => { const k = key(a); if (k) keys.add(k); });
+  return { id: jp + '|' + rd, sets: sets.split(','), jp, kana: rd, vi, alts: altList, keys, romaji: toRomaji(rd) };
+});
+function isCorrect(item, input) {
+  const whole = key(input);
+  if (!whole) return false;
+  if (item.keys.has(whole)) return true;
+  const toks = String(input).split(/[,;\/]/).map(key).filter(Boolean);
+  return toks.length > 1 && toks.every(t => item.keys.has(t));
+}
+// ==LOGIC-END==
+
+/* ---------- thống kê (lưu trên trình duyệt này) ---------- */
+const SKEY = 'tuvung-nhat-stats-v1';
+function loadStats() { try { const v = JSON.parse(localStorage.getItem(SKEY)); return v && typeof v === 'object' ? v : {}; } catch (e) { return {}; } }
+function saveStats() { try { localStorage.setItem(SKEY, JSON.stringify(stats)); } catch (e) {} }
+let stats = loadStats();
+const wrongCount = it => (stats[it.id] && stats[it.id].w) || 0;
+
+/* ---------- trạng thái ---------- */
+const state = {
+  view: 'setup', sel: new Set(SETS.map(s => s.id)), limit: 20, romaji: true, weakOnly: false,
+  queue: [], i: 0, phase: 'ask', cur: null, log: [], confirmReset: false, q: ''
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const lenOf = s => [...s].length;
+const sizeCls = s => { const n = lenOf(s); return n <= 4 ? 'l1' : n <= 8 ? 'l2' : n <= 12 ? 'l3' : 'l4'; };
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pool() { return ITEMS.filter(it => it.sets.some(s => state.sel.has(s)) && (!state.weakOnly || wrongCount(it) > 0)); }
+const setName = id => (SETS.find(s => s.id === id) || {}).n || id;
+
+/* ---------- màn chọn ---------- */
+function viewSetup() {
+  const p = pool(), n = state.limit ? Math.min(p.length, state.limit) : p.length;
+  const weakTotal = ITEMS.filter(it => wrongCount(it) > 0).length;
+  const cards = SETS.map(s => {
+    const c = ITEMS.filter(it => it.sets.includes(s.id)).length;
+    return `<button type="button" class="set" id="set-${s.id}" data-act="toggle-set" data-s="${s.id}" aria-pressed="${state.sel.has(s.id)}">
+      <span class="sn">${esc(s.n)}</span><span class="sd">${esc(s.d)}</span><span class="sc">${c} từ</span></button>`;
+  }).join('');
+  const lim = [[10, '10 câu'], [20, '20 câu'], [30, '30 câu'], [50, '50 câu'], [0, 'Tất cả']]
+    .map(o => `<option value="${o[0]}" ${state.limit === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('');
+  return `<section>
+    <h1 style="font-size:28px;letter-spacing:-.02em">Luyện từ vựng</h1>
+    <p class="lede">Hiện một từ tiếng Nhật kèm phiên âm. Bạn gõ nghĩa tiếng Việt rồi nhấn Enter. Đúng thì báo đúng, sai thì hiện nghĩa đúng.</p>
+    <div class="sets">${cards}</div>
+    <div class="opts card" style="margin-top:18px">
+      <label class="check"><input type="checkbox" id="o-romaji" data-opt="romaji" ${state.romaji ? 'checked' : ''}><span>Hiện phiên âm romaji<span class="sub"><br>ví dụ: がっこう → gakkou</span></span></label>
+      <label class="check"><input type="checkbox" id="o-weak" data-opt="weak" ${state.weakOnly ? 'checked' : ''} ${weakTotal ? '' : 'disabled'}><span>Chỉ luyện từ hay sai<span class="sub"><br>${weakTotal ? weakTotal + ' từ từng sai' : 'Chưa có từ nào sai'}</span></span></label>
+      <div><label class="eyebrow" for="o-limit">Số câu mỗi lượt</label><br><select id="o-limit" data-opt="limit">${lim}</select></div>
+      <div class="startrow">
+        <button type="button" class="btn" id="start" data-act="start" ${n === 0 ? 'disabled' : ''}>Bắt đầu (${n} từ)</button>
+        <span class="warn" id="warn">${n === 0 ? 'Chưa có từ nào khớp lựa chọn.' : ''}</span>
+      </div>
+    </div>
+  </section>`;
+}
+
+/* ---------- màn hỏi ---------- */
+function viewQuiz() {
+  const it = state.queue[state.i], total = state.queue.length, rev = state.phase === 'review', a = state.cur;
+  const pct = Math.round((state.i + (rev ? 1 : 0)) / total * 100);
+  const showKana = it.kana !== it.jp;
+  let fb = '';
+  if (rev) {
+    const more = it.alts.slice(0, 5).join(', ');
+    fb = a.ok
+      ? `<div class="fb ok" role="status"><div class="t">Đúng rồi!</div><div class="more">Nghĩa: ${esc(it.vi)}${more ? ' · cũng được: ' + esc(more) : ''}</div></div>`
+      : `<div class="fb no" role="status"><div class="t">${a.input ? 'Sai rồi' : 'Chưa trả lời'}</div><div class="ans">${esc(it.vi)}</div>${more ? `<div class="more">Cũng chấp nhận: ${esc(more)}</div>` : ''}</div>`;
+  }
+  return `<div class="qbar"><span class="count">${state.i + 1} / ${total}</span><div class="bar"><i style="width:${pct}%"></i></div><button type="button" class="btn ghost small" data-act="quit">Thoát</button></div>
+  <div class="card qcard">
+    <div class="word">
+      <div class="jp ${sizeCls(it.jp)}" lang="ja">${esc(it.jp)}</div>
+      ${showKana ? `<div class="reading" lang="ja">${esc(it.kana)}</div>` : ''}
+      ${state.romaji ? `<div class="romaji">${esc(it.romaji)}</div>` : ''}
+    </div>
+    <div class="field ${rev ? (a.ok ? 'ok' : 'no') : ''}">
+      <label for="in-mean">Nghĩa tiếng Việt</label>
+      <input id="in-mean" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${rev ? 'disabled' : ''} value="${esc(rev ? a.input : '')}" placeholder="Gõ nghĩa rồi nhấn Enter">
+    </div>
+    ${fb}
+    <div class="actions">
+      ${rev ? '<button type="button" class="btn" id="next" data-act="next">Tiếp tục</button><span class="hint">hoặc nhấn Enter</span>'
+            : '<button type="button" class="btn" id="check" data-act="check">Kiểm tra</button><span class="hint">hoặc nhấn Enter (để trống = không biết)</span>'}
+    </div>
+  </div>`;
+}
+
+/* ---------- kết quả ---------- */
+function viewResults() {
+  const ok = state.log.filter(a => a.ok).length, total = state.log.length, wrong = state.log.filter(a => !a.ok);
+  const pct = total ? Math.round(ok / total * 100) : 0;
+  const list = wrong.map(a => `<div class="item">
+      <div><div class="j" lang="ja">${esc(a.it.jp)}</div><div class="r">${esc(a.it.romaji)}</div></div>
+      <div class="m"><b class="good-text">${esc(a.it.vi)}</b><small>Bạn gõ: <span class="bad-text">${a.input ? esc(a.input) : '(trống)'}</span></small></div></div>`).join('');
+  return `<section class="card">
+    <div class="eyebrow">Kết quả</div>
+    <div class="score"><span class="big">${ok}/${total}</span><span class="pct">${pct}% đúng</span></div>
+    <div class="rowacts">
+      ${wrong.length ? `<button type="button" class="btn" data-act="retry-wrong">Làm lại ${wrong.length} từ sai</button>` : ''}
+      <button type="button" class="btn ${wrong.length ? 'ghost' : ''}" data-act="retry-all">Luyện lại bộ này</button>
+      <button type="button" class="btn ghost" data-act="goto" data-v="setup">Chọn bộ khác</button>
+    </div>
+    ${wrong.length ? `<h2 style="font-size:16px;margin-top:26px">Từ cần ôn lại</h2><div class="wlist">${list}</div>` : '<p class="empty">Không sai từ nào. Tốt lắm!</p>'}
+  </section>`;
+}
+
+/* ---------- danh sách ---------- */
+function listRows() {
+  const q = key(state.q), qraw = state.q.trim().toLowerCase();
+  const rows = ITEMS.filter(it => !qraw || it.jp.includes(state.q.trim()) || it.kana.includes(state.q.trim()) ||
+    it.romaji.includes(qraw) || key(it.vi).includes(q) || it.alts.some(a => key(a).includes(q)));
+  if (!rows.length) return '<p class="empty">Không tìm thấy từ nào.</p>';
+  return rows.map(it => {
+    const w = wrongCount(it);
+    return `<div class="item">
+      <div><div class="j" lang="ja">${esc(it.jp)}</div><div class="r">${esc(it.romaji)}</div></div>
+      <div class="m"><b>${esc(it.vi)}</b>${it.kana !== it.jp ? `<small lang="ja">${esc(it.kana)}</small>` : ''}
+        <small>${it.sets.map(s => `<span class="tag">${esc(setName(s))}</span>`).join('')}${w ? `<span class="tag w">sai ${w} lần</span>` : ''}</small></div></div>`;
+  }).join('');
+}
+function viewList() {
+  const hasStats = Object.keys(stats).length > 0;
+  return `<section>
+    <h1 style="font-size:28px;letter-spacing:-.02em">Danh sách từ</h1>
+    <p class="lede">${ITEMS.length} từ. Tìm theo chữ Nhật, romaji hoặc nghĩa tiếng Việt.</p>
+    <input class="search" id="search" type="search" placeholder="Tìm từ..." value="${esc(state.q)}" autocomplete="off">
+    <div id="rows">${listRows()}</div>
+    <div class="rowacts">${state.confirmReset
+      ? '<button type="button" class="btn danger" data-act="reset-stats">Xóa hẳn thống kê</button><button type="button" class="btn ghost" data-act="cancel-reset">Giữ lại</button>'
+      : `<button type="button" class="btn ghost small" data-act="confirm-reset" ${hasStats ? '' : 'disabled'}>Xóa thống kê từ hay sai</button>`}</div>
+  </section>`;
+}
+
+/* ---------- vẽ và điều khiển ---------- */
+let focusId = null;
+function render() {
+  const inPractice = state.view !== 'list';
+  $('#nav-practice').setAttribute('aria-current', inPractice ? 'page' : 'false');
+  $('#nav-list').setAttribute('aria-current', inPractice ? 'false' : 'page');
+  $('#view').innerHTML = { setup: viewSetup, quiz: viewQuiz, results: viewResults, list: viewList }[state.view]();
+  if (state.view === 'quiz') {
+    if (state.phase === 'ask') $('#in-mean')?.focus(); else $('#next')?.focus();
+  } else if (focusId) document.getElementById(focusId)?.focus();
+  focusId = null;
+}
+function startQuiz(list) {
+  state.queue = shuffle(list.slice()); state.i = 0; state.phase = 'ask'; state.cur = null; state.log = []; state.view = 'quiz';
+  window.scrollTo(0, 0); render();
+}
+function submitAnswer() {
+  const it = state.queue[state.i];
+  const input = ($('#in-mean')?.value ?? '').trim();
+  const ok = isCorrect(it, input);
+  const a = { it, input, ok };
+  state.cur = a; state.log.push(a);
+  const s = stats[it.id] || (stats[it.id] = { n: 0, w: 0 });
+  s.n++; if (!ok) s.w++;
+  saveStats();
+  state.phase = 'review'; render();
+}
+function nextQ() {
+  state.i++;
+  if (state.i >= state.queue.length) { state.view = 'results'; window.scrollTo(0, 0); }
+  else state.phase = 'ask';
+  render();
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act;
+  if (act === 'toggle-set') { const s = el.dataset.s; state.sel.has(s) ? state.sel.delete(s) : state.sel.add(s); focusId = el.id; render(); }
+  else if (act === 'start') { const p = shuffle(pool().slice()); startQuiz(state.limit ? p.slice(0, state.limit) : p); }
+  else if (act === 'check') submitAnswer();
+  else if (act === 'next') nextQ();
+  else if (act === 'quit') { state.view = 'setup'; render(); }
+  else if (act === 'goto') { state.view = el.dataset.v; state.confirmReset = false; window.scrollTo(0, 0); render(); }
+  else if (act === 'retry-wrong') startQuiz(state.log.filter(a => !a.ok).map(a => a.it));
+  else if (act === 'retry-all') startQuiz(state.log.map(a => a.it));
+  else if (act === 'confirm-reset') { state.confirmReset = true; render(); }
+  else if (act === 'cancel-reset') { state.confirmReset = false; render(); }
+  else if (act === 'reset-stats') { stats = {}; saveStats(); state.confirmReset = false; state.weakOnly = false; render(); }
+});
+document.addEventListener('change', e => {
+  const t = e.target, o = t.dataset && t.dataset.opt; if (!o) return;
+  if (o === 'romaji') state.romaji = t.checked;
+  else if (o === 'weak') state.weakOnly = t.checked;
+  else if (o === 'limit') state.limit = +t.value;
+  focusId = t.id || null; render();
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'search') { state.q = e.target.value; $('#rows').innerHTML = listRows(); }
+});
+document.addEventListener('keydown', e => {
+  if (state.view !== 'quiz' || e.key !== 'Enter' || e.isComposing) return;
+  if (state.phase === 'ask' && e.target.id === 'in-mean') { e.preventDefault(); submitAnswer(); }
+  else if (state.phase === 'review' && (e.target === document.body || e.target.id === 'next')) { e.preventDefault(); nextQ(); }
+});
+render();
+</script>
+</body>
+</html>
