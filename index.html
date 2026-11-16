@@ -51,10 +51,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn.danger{background:transparent;color:var(--bad);border:1px solid var(--bad)}
 
 /* setup */
-.sets{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:18px}
+.lesson{margin-top:22px}
+.lh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lh h2{font-size:16px}
+.sets{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:10px}
 .set{text-align:left;padding:14px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
 .set .sn{color:var(--fg);font-weight:600}
-.set .sd{font-size:13px}
 .set .sc{font-size:12px;font-variant-numeric:tabular-nums}
 .set[aria-pressed="true"]{border-color:var(--accent);background:var(--surface2)}
 .opts{display:flex;flex-direction:column;gap:14px;margin-top:18px}
@@ -132,188 +134,209 @@ button{font:inherit;color:inherit;cursor:pointer}
 // ==LOGIC-START==
 /* Mỗi dòng: bộ | chữ Nhật | cách đọc (để trống nếu giống chữ Nhật) | nghĩa chính | các nghĩa khác chấp nhận (cách nhau bằng ;)
    Muốn thêm từ mới: copy một dòng và sửa. Bộ: b1, dt, dg, b2 (có thể ghi nhiều bộ: b1,b2). */
+const LESSONS = [
+  { id: 'b1', n: 'Bài 1' }, { id: 'b2', n: 'Bài 2' }, { id: 'b3', n: 'Bài 3' }
+];
 const SETS = [
-  { id: 'b1', n: 'Bài 1 · Từ vựng', d: 'Quốc gia, nghề nghiệp, trường học, thể thao, sở thích' },
-  { id: 'dt', n: 'Danh từ', d: 'Thời gian, địa điểm, lễ hội, mùa, đồ ăn, thiết bị' },
-  { id: 'dg', n: 'Động từ', d: 'Đi, đến, ăn, uống, đọc, học, làm việc...' },
-  { id: 'b2', n: 'Bài 2 · Từ vựng', d: 'Cửa hàng, đồ vật, đồ ăn, đồ uống, quốc gia' }
+  { id: 'b1-nuoc', l: 'b1', n: 'Các nước' },
+  { id: 'b1-nghe', l: 'b1', n: 'Nghề nghiệp & trường học' },
+  { id: 'b1-sothich', l: 'b1', n: 'Thể thao & sở thích' },
+  { id: 'b2-mall', l: 'b2', n: 'Trong trung tâm mua sắm' },
+  { id: 'b2-tech', l: 'b2', n: 'Đồ điện tử & học tập' },
+  { id: 'b2-wear', l: 'b2', n: 'Quần áo & đồ dùng' },
+  { id: 'b2-shop', l: 'b2', n: 'Cửa hàng & nhân viên' },
+  { id: 'b2-basic', l: 'b2', n: 'Thực phẩm cơ bản' },
+  { id: 'b2-ingr', l: 'b2', n: 'Trái cây, thịt, cá & rau' },
+  { id: 'b2-dish', l: 'b2', n: 'Món ăn' },
+  { id: 'b2-drink', l: 'b2', n: 'Đồ uống' },
+  { id: 'b2-lang', l: 'b2', n: 'Nước & ngôn ngữ' },
+  { id: 'b3-time', l: 'b3', n: 'Thời gian' },
+  { id: 'b3-thu', l: 'b3', n: 'Thứ trong tuần' },
+  { id: 'b3-place', l: 'b3', n: 'Địa điểm' },
+  { id: 'b3-school', l: 'b3', n: 'Lớp học & việc làm thêm' },
+  { id: 'b3-season', l: 'b3', n: 'Mùa & kỳ nghỉ' },
+  { id: 'b3-event', l: 'b3', n: 'Lễ hội & hoạt động' },
+  { id: 'b3-food', l: 'b3', n: 'Bữa ăn & đồ ăn' },
+  { id: 'b3-media', l: 'b3', n: 'Báo, TV, internet' },
+  { id: 'b3-v1', l: 'b3', n: 'Động từ 1: đi, đến, ăn, uống, xem' },
+  { id: 'b3-v2', l: 'b3', n: 'Động từ 2: dậy, ngủ, nghe, mua, đọc, học' }
 ];
 
 const RAW = `
-b1|にほん||Nhật Bản|nhật;nhat ban;japan
-b1|かんこく||Hàn Quốc|hàn;korea
-b1|ちゅうごく||Trung Quốc|trung;trung hoa;china
-b1|タイ||Thái Lan|thái;thailand
-b1|ベトナム||Việt Nam|việt;vn;vietnam
-b1|オーストラリア||Úc|australia;nước úc
-b1|アメリカ||Mỹ|hoa kỳ;america;usa;nước mỹ
-b1|イタリア||Ý|italy;nước ý;italia
-b1|ロシア||Nga|russia;nước nga
-b1,b2|インド||Ấn Độ|india
-b1|ブラジル||Brazil|braxin;bra-xin;brasil
-b1|しごと||công việc|việc làm;nghề nghiệp;nghề;công tác
-b1|きょうし||giáo viên|thầy giáo;cô giáo;giảng viên;nhà giáo
-b1|かいしゃいん||nhân viên văn phòng|nhân viên công ty;nhân viên;nhân viên công ti
-b1|がくせい||học sinh|sinh viên;học trò;học sinh sinh viên
-b1|せんせい||thầy/cô|thầy;cô;thầy cô;thầy giáo;cô giáo;giáo viên;giảng viên
-b1|だいがく||trường đại học|đại học;university;trường đh
-b1|こうこう||trường cấp ba|cấp ba;cấp 3;trường cấp 3;trung học phổ thông;thpt;trường thpt;trường trung học phổ thông;high school;phổ thông trung học
-b1|にほんごがっこう||trường tiếng Nhật|trường nhật ngữ;nhật ngữ;trường dạy tiếng nhật;trường học tiếng nhật;trung tâm tiếng nhật
-b1|たんじょうび||sinh nhật|ngày sinh;ngày sinh nhật;birthday
-b1|スポーツ||thể thao|sport;sports;môn thể thao
-b1|テニス||tennis|quần vợt;ten-nít;tenis;môn tennis
-b1|すいえい||bơi lội|bơi;môn bơi;swimming
-b1|サッカー||bóng đá|đá bóng;soccer;football;môn bóng đá
-b1|えいが||phim ảnh|phim;điện ảnh;movie;bộ phim;xem phim
-b1|どくしょ||đọc sách|việc đọc sách;đọc;độc thư
-b1|おんがく||âm nhạc|nhạc;music
-b1|りょこう||du lịch|chuyến du lịch;đi du lịch;travel;chuyến đi
-b1,b2|りょうり||nấu ăn / món ăn|nấu ăn;món ăn;nấu nướng;đồ ăn;thức ăn;ẩm thực;cooking;món;nấu;nấu cơm
+b1-nuoc|にほん||Nhật Bản|nhật;nhat ban;japan
+b1-nuoc|かんこく||Hàn Quốc|hàn;korea
+b1-nuoc|ちゅうごく||Trung Quốc|trung;trung hoa;china
+b1-nuoc|タイ||Thái Lan|thái;thailand
+b1-nuoc|ベトナム||Việt Nam|việt;vn;vietnam
+b1-nuoc|オーストラリア||Úc|australia;nước úc
+b1-nuoc|アメリカ||Mỹ|hoa kỳ;america;usa;nước mỹ
+b1-nuoc|イタリア||Ý|italy;nước ý;italia
+b1-nuoc|ロシア||Nga|russia;nước nga
+b1-nuoc,b2-lang|インド||Ấn Độ|india
+b1-nuoc|ブラジル||Brazil|braxin;bra-xin;brasil
+b1-nghe|しごと||công việc|việc làm;nghề nghiệp;nghề;công tác
+b1-nghe|きょうし||giáo viên|thầy giáo;cô giáo;giảng viên;nhà giáo
+b1-nghe|かいしゃいん||nhân viên văn phòng|nhân viên công ty;nhân viên;nhân viên công ti
+b1-nghe|がくせい||học sinh|sinh viên;học trò;học sinh sinh viên
+b1-nghe|せんせい||thầy/cô|thầy;cô;thầy cô;thầy giáo;cô giáo;giáo viên;giảng viên
+b1-nghe|だいがく||trường đại học|đại học;university;trường đh
+b1-nghe|こうこう||trường cấp ba|cấp ba;cấp 3;trường cấp 3;trung học phổ thông;thpt;trường thpt;trường trung học phổ thông;high school;phổ thông trung học
+b1-nghe|にほんごがっこう||trường tiếng Nhật|trường nhật ngữ;nhật ngữ;trường dạy tiếng nhật;trường học tiếng nhật;trung tâm tiếng nhật
+b1-sothich|たんじょうび||sinh nhật|ngày sinh;ngày sinh nhật;birthday
+b1-sothich|スポーツ||thể thao|sport;sports;môn thể thao
+b1-sothich|テニス||tennis|quần vợt;ten-nít;tenis;môn tennis
+b1-sothich|すいえい||bơi lội|bơi;môn bơi;swimming
+b1-sothich|サッカー||bóng đá|đá bóng;soccer;football;môn bóng đá
+b1-sothich|えいが||phim ảnh|phim;điện ảnh;movie;bộ phim;xem phim
+b1-sothich|どくしょ||đọc sách|việc đọc sách;đọc;độc thư
+b1-sothich|おんがく||âm nhạc|nhạc;music
+b1-sothich|りょこう||du lịch|chuyến du lịch;đi du lịch;travel;chuyến đi
+b1-sothich,b2-dish|りょうり||nấu ăn / món ăn|nấu ăn;món ăn;nấu nướng;đồ ăn;thức ăn;ẩm thực;cooking;món;nấu;nấu cơm
 
-dt|あさ||buổi sáng|sáng
-dt|ひる||buổi trưa|trưa;ban ngày
-dt|よる・ばん|よる・ばん|buổi tối|tối;đêm;ban đêm;buổi đêm
-dt|ごぜん||buổi sáng (AM)|sáng;buổi sáng;am;trước trưa;trước 12 giờ trưa
-dt|ごご||buổi chiều (PM)|chiều;buổi chiều;pm;sau trưa;sau 12 giờ trưa
-dt|ぎんこう||ngân hàng|bank
-dt|たいいくかん||nhà thi đấu|nhà thể dục;nhà thể thao;phòng thể dục;nhà thể chất;nhà thi đấu thể thao;phòng tập thể dục;gymnasium;nhà thể dục thể thao
-dt|としょかん||thư viện|library
-dt|びょういん||bệnh viện|hospital;nhà thương
-dt|ゆうびんきょく||bưu điện|post office;nhà bưu điện;bưu cục
-dt|きょうしつ||phòng học|lớp học;classroom;lớp
-dt|じゅぎょう||giờ học|tiết học;buổi học;bài giảng;giờ lên lớp;lớp học
-dt|テスト||bài kiểm tra|kiểm tra;test;bài thi;thi;bài test;kỳ thi;kì thi
-dt|やすみ||nghỉ / ngày nghỉ|nghỉ;ngày nghỉ;kỳ nghỉ;kì nghỉ;nghỉ ngơi;nghỉ phép;nghỉ học;giờ nghỉ;nghỉ lễ
-dt|じかん||thời gian|giờ;time;khoảng thời gian
-dt|～ようび||thứ ~|ngày thứ;thứ trong tuần;ngày trong tuần;thứ;weekday
-dt|にちようび||chủ nhật|chúa nhật;cn;sunday
-dt|げつようび||thứ hai|thứ 2;2;t2;monday
-dt|かようび||thứ ba|thứ 3;3;t3;tuesday
-dt|すいようび||thứ tư|thứ 4;4;t4;wednesday
-dt|もくようび||thứ năm|thứ 5;5;t5;thursday
-dt|きんようび||thứ sáu|thứ 6;6;t6;friday
-dt|どようび||thứ bảy|thứ 7;7;t7;saturday
-dt|スケジュール||lịch trình|lịch;kế hoạch;thời khóa biểu;lịch làm việc;schedule;thời gian biểu
-dt|アルバイト||việc làm thêm|làm thêm;công việc làm thêm;part time;part-time;bán thời gian;đi làm thêm
-dt|スキー||trượt tuyết|ski;môn trượt tuyết
-dt|パーティー||tiệc|bữa tiệc;party;buổi tiệc;tiệc tùng
-dt|バーベキュー||tiệc nướng|bbq;thịt nướng;nướng;barbecue;đồ nướng;tiệc thịt nướng;bữa tiệc nướng
-dt|はなび||pháo hoa|bắn pháo hoa;hoa lửa;fireworks;pháo bông
-dt|おはなみ||ngắm hoa anh đào|ngắm hoa;ngắm hoa đào;hanami;đi ngắm hoa;tiệc ngắm hoa
-dt|ホームステイ||homestay|ở nhà dân;home stay;ở nhà người bản xứ;ở cùng gia đình;ở trọ nhà dân
-dt|おまつり||lễ hội|festival;hội;ngày hội;matsuri;lễ hội truyền thống
-dt|うみ||biển|đại dương;bờ biển;sea;ocean
-dt|こうえん||công viên|park;vườn hoa
-dt|さくら||hoa anh đào|anh đào;hoa đào;sakura;cherry blossom
-dt|おさけ||rượu|sake;rượu sake;rượu nhật;rượu gạo;đồ uống có cồn
-dt|おすし||sushi|cơm cuộn;cơm nắm;susi
-dt|バス||xe buýt|xe bus;bus;buýt
-dt|おべんとう||cơm hộp|bento;hộp cơm;cơm bento;cơm trưa mang theo;phần cơm hộp
-dt|りゅうがくせい||du học sinh|lưu học sinh;sinh viên quốc tế
-dt|いちねん||một năm|1 năm;năm nhất;năm thứ nhất;1 year;năm đầu tiên;năm 1
-dt|春|はる|mùa xuân|xuân;spring
-dt|夏|なつ|mùa hè|hè;summer
-dt|秋|あき|mùa thu|thu;autumn;fall
-dt|冬|ふゆ|mùa đông|đông;winter
-dt|夏休み|なつやすみ|kỳ nghỉ hè|nghỉ hè;kì nghỉ hè;kỳ nghĩ hè;nghĩ hè;kỳ nghỉ mùa hè;nghỉ mùa hè;summer vacation
-dt|ゴールデンウイーク||Tuần lễ vàng|golden week;tuần vàng;kỳ nghỉ tuần lễ vàng
-dt|まいにち||mỗi ngày|hàng ngày;hằng ngày;mọi ngày;everyday;ngày nào cũng
-dt|まい～||mỗi ~|mỗi;mọi;every
-dt|あさごはん||bữa sáng|cơm sáng;ăn sáng;bữa ăn sáng;bữa điểm tâm;điểm tâm
-dt|ひるごはん||bữa trưa|cơm trưa;ăn trưa;bữa ăn trưa
-dt|ばんごはん||bữa tối|cơm tối;ăn tối;bữa ăn tối;bữa cơm tối
-dt|うち||nhà|nhà của tôi;nhà tôi;ngôi nhà;gia đình;house;home;nhà ở
-dt|コンビニ||cửa hàng tiện lợi|tiện lợi;convenience store;cửa hàng 24h;tiệm tiện lợi
-dt|かいしゃ||công ty|công ti;company;cty
-dt|がっこう||trường học|trường;school;nhà trường
-dt|ぎゅうにゅう||sữa bò|sữa;sữa tươi;milk
-dt|くだもの||trái cây|hoa quả;quả;trái;fruit
-dt|サラダ||salad|xà lách;rau trộn;gỏi;sa lát;xa lát;rau sống
-dt|チーズ||phô mai|pho mai;phomai;cheese
-dt|インターネット||internet|mạng;mạng internet;in-tơ-nét;mạng toàn cầu;net
-dt|しんぶん||báo|tờ báo;báo chí;báo giấy;newspaper;báo ngày
-dt|テレビ||tivi|ti vi;tv;truyền hình;television;vô tuyến;vô tuyến truyền hình
-dt|CD|シーディ|đĩa CD|cd;đĩa nhạc;compact disc;đĩa
-dt|DVD|ディーブイディー|đĩa DVD|dvd;đĩa phim;đĩa
+b3-time|あさ||buổi sáng|sáng
+b3-time|ひる||buổi trưa|trưa;ban ngày
+b3-time|よる・ばん|よる・ばん|buổi tối|tối;đêm;ban đêm;buổi đêm
+b3-time|ごぜん||buổi sáng (AM)|sáng;buổi sáng;am;trước trưa;trước 12 giờ trưa
+b3-time|ごご||buổi chiều (PM)|chiều;buổi chiều;pm;sau trưa;sau 12 giờ trưa
+b3-place|ぎんこう||ngân hàng|bank
+b3-place|たいいくかん||nhà thi đấu|nhà thể dục;nhà thể thao;phòng thể dục;nhà thể chất;nhà thi đấu thể thao;phòng tập thể dục;gymnasium;nhà thể dục thể thao
+b3-place|としょかん||thư viện|library
+b3-place|びょういん||bệnh viện|hospital;nhà thương
+b3-place|ゆうびんきょく||bưu điện|post office;nhà bưu điện;bưu cục
+b3-school|きょうしつ||phòng học|lớp học;classroom;lớp
+b3-school|じゅぎょう||giờ học|tiết học;buổi học;bài giảng;giờ lên lớp;lớp học
+b3-school|テスト||bài kiểm tra|kiểm tra;test;bài thi;thi;bài test;kỳ thi;kì thi
+b3-school|やすみ||nghỉ / ngày nghỉ|nghỉ;ngày nghỉ;kỳ nghỉ;kì nghỉ;nghỉ ngơi;nghỉ phép;nghỉ học;giờ nghỉ;nghỉ lễ
+b3-time|じかん||thời gian|giờ;time;khoảng thời gian
+b3-thu|～ようび||thứ ~|ngày thứ;thứ trong tuần;ngày trong tuần;thứ;weekday
+b3-thu|にちようび||chủ nhật|chúa nhật;cn;sunday
+b3-thu|げつようび||thứ hai|thứ 2;2;t2;monday
+b3-thu|かようび||thứ ba|thứ 3;3;t3;tuesday
+b3-thu|すいようび||thứ tư|thứ 4;4;t4;wednesday
+b3-thu|もくようび||thứ năm|thứ 5;5;t5;thursday
+b3-thu|きんようび||thứ sáu|thứ 6;6;t6;friday
+b3-thu|どようび||thứ bảy|thứ 7;7;t7;saturday
+b3-thu|スケジュール||lịch trình|lịch;kế hoạch;thời khóa biểu;lịch làm việc;schedule;thời gian biểu
+b3-school|アルバイト||việc làm thêm|làm thêm;công việc làm thêm;part time;part-time;bán thời gian;đi làm thêm
+b3-event|スキー||trượt tuyết|ski;môn trượt tuyết
+b3-event|パーティー||tiệc|bữa tiệc;party;buổi tiệc;tiệc tùng
+b3-event|バーベキュー||tiệc nướng|bbq;thịt nướng;nướng;barbecue;đồ nướng;tiệc thịt nướng;bữa tiệc nướng
+b3-event|はなび||pháo hoa|bắn pháo hoa;hoa lửa;fireworks;pháo bông
+b3-event|おはなみ||ngắm hoa anh đào|ngắm hoa;ngắm hoa đào;hanami;đi ngắm hoa;tiệc ngắm hoa
+b3-event|ホームステイ||homestay|ở nhà dân;home stay;ở nhà người bản xứ;ở cùng gia đình;ở trọ nhà dân
+b3-event|おまつり||lễ hội|festival;hội;ngày hội;matsuri;lễ hội truyền thống
+b3-place|うみ||biển|đại dương;bờ biển;sea;ocean
+b3-place|こうえん||công viên|park;vườn hoa
+b3-event|さくら||hoa anh đào|anh đào;hoa đào;sakura;cherry blossom
+b3-food|おさけ||rượu|sake;rượu sake;rượu nhật;rượu gạo;đồ uống có cồn
+b3-food|おすし||sushi|cơm cuộn;cơm nắm;susi
+b3-event|バス||xe buýt|xe bus;bus;buýt
+b3-food|おべんとう||cơm hộp|bento;hộp cơm;cơm bento;cơm trưa mang theo;phần cơm hộp
+b3-school|りゅうがくせい||du học sinh|lưu học sinh;sinh viên quốc tế
+b3-time|いちねん||một năm|1 năm;năm nhất;năm thứ nhất;1 year;năm đầu tiên;năm 1
+b3-season|春|はる|mùa xuân|xuân;spring
+b3-season|夏|なつ|mùa hè|hè;summer
+b3-season|秋|あき|mùa thu|thu;autumn;fall
+b3-season|冬|ふゆ|mùa đông|đông;winter
+b3-season|夏休み|なつやすみ|kỳ nghỉ hè|nghỉ hè;kì nghỉ hè;kỳ nghĩ hè;nghĩ hè;kỳ nghỉ mùa hè;nghỉ mùa hè;summer vacation
+b3-season|ゴールデンウイーク||Tuần lễ vàng|golden week;tuần vàng;kỳ nghỉ tuần lễ vàng
+b3-time|まいにち||mỗi ngày|hàng ngày;hằng ngày;mọi ngày;everyday;ngày nào cũng
+b3-time|まい～||mỗi ~|mỗi;mọi;every
+b3-food|あさごはん||bữa sáng|cơm sáng;ăn sáng;bữa ăn sáng;bữa điểm tâm;điểm tâm
+b3-food|ひるごはん||bữa trưa|cơm trưa;ăn trưa;bữa ăn trưa
+b3-food|ばんごはん||bữa tối|cơm tối;ăn tối;bữa ăn tối;bữa cơm tối
+b3-place|うち||nhà|nhà của tôi;nhà tôi;ngôi nhà;gia đình;house;home;nhà ở
+b3-place|コンビニ||cửa hàng tiện lợi|tiện lợi;convenience store;cửa hàng 24h;tiệm tiện lợi
+b3-place|かいしゃ||công ty|công ti;company;cty
+b3-place|がっこう||trường học|trường;school;nhà trường
+b3-food|ぎゅうにゅう||sữa bò|sữa;sữa tươi;milk
+b3-food|くだもの||trái cây|hoa quả;quả;trái;fruit
+b3-food|サラダ||salad|xà lách;rau trộn;gỏi;sa lát;xa lát;rau sống
+b3-food|チーズ||phô mai|pho mai;phomai;cheese
+b3-media|インターネット||internet|mạng;mạng internet;in-tơ-nét;mạng toàn cầu;net
+b3-media|しんぶん||báo|tờ báo;báo chí;báo giấy;newspaper;báo ngày
+b3-media|テレビ||tivi|ti vi;tv;truyền hình;television;vô tuyến;vô tuyến truyền hình
+b3-media|CD|シーディ|đĩa CD|cd;đĩa nhạc;compact disc;đĩa
+b3-media|DVD|ディーブイディー|đĩa DVD|dvd;đĩa phim;đĩa
 
-dg|いきます||đi|đi tới;đi đến
-dg|きます||đến|tới;đến nơi;đến đây;đi đến
-dg|かえります||về|trở về;về nhà;quay về;đi về
-dg|たべます||ăn|ăn uống;dùng bữa
-dg|のみます||uống|uống nước
-dg|みます||xem|nhìn;ngắm;coi;nhìn thấy
-dg|～します||làm ~ / chơi ~|làm;chơi;thực hiện
-dg|おきます||thức dậy|dậy;thức giấc;dậy sớm;ngủ dậy;thức
-dg|ねます||ngủ|đi ngủ;đi nằm;nằm ngủ
-dg|ききます||nghe|hỏi;lắng nghe
-dg|かいます||mua|mua sắm;mua đồ
-dg|よみます||đọc|đọc sách
-dg|べんきょうします||học|học bài;học tập;học hành;ôn bài;ôn tập
-dg|はたらきます||làm việc|đi làm;công tác;lao động;làm
+b3-v1|いきます||đi|đi tới;đi đến
+b3-v1|きます||đến|tới;đến nơi;đến đây;đi đến
+b3-v1|かえります||về|trở về;về nhà;quay về;đi về
+b3-v1|たべます||ăn|ăn uống;dùng bữa
+b3-v1|のみます||uống|uống nước
+b3-v1|みます||xem|nhìn;ngắm;coi;nhìn thấy
+b3-v1|～します||làm ~ / chơi ~|làm;chơi;thực hiện
+b3-v2|おきます||thức dậy|dậy;thức giấc;dậy sớm;ngủ dậy;thức
+b3-v2|ねます||ngủ|đi ngủ;đi nằm;nằm ngủ
+b3-v2|ききます||nghe|hỏi;lắng nghe
+b3-v2|かいます||mua|mua sắm;mua đồ
+b3-v2|よみます||đọc|đọc sách
+b3-v2|べんきょうします||học|học bài;học tập;học hành;ôn bài;ôn tập
+b3-v2|はたらきます||làm việc|đi làm;công tác;lao động;làm
 
-b2|インフォメーション||quầy thông tin|thông tin;information;quầy hướng dẫn;quầy tư vấn;quầy tiếp tân;quầy giải đáp
-b2|ATM|エーティーエム|cây ATM|atm;máy atm;máy rút tiền;máy rút tiền tự động
-b2|エスカレーター||thang cuốn|thang cuốn tự động;escalator;thang chạy
-b2|エレベーター||thang máy|elevator;lift
-b2|トイレ||toilet|nhà vệ sinh;wc;phòng vệ sinh;toa lét;cầu tiêu;nhà xí
-b2|レジ||thu ngân|quầy thu ngân;quầy tính tiền;máy tính tiền;thanh toán;register;người thu ngân;quầy thanh toán
-b2|スーパー||siêu thị|supermarket
-b2|100えんショップ|ひゃくえんショップ|cửa hàng đồng giá 100 yên|cửa hàng 100 yên;cửa hàng đồng giá;tiệm 100 yên;đồng giá 100 yên;shop 100 yên;cửa hàng một trăm yên
-b2|レストラン||nhà hàng|restaurant;quán ăn;tiệm ăn
-b2|きっさてん||quán cà phê|quán cafe;tiệm cà phê;quán nước;cafe;tiệm cafe;quán giải khát
-b2|きつえんじょ||nơi hút thuốc|khu hút thuốc;chỗ hút thuốc;phòng hút thuốc;khu vực hút thuốc;hút thuốc;smoking
-b2|ちか||dưới mặt đất|tầng hầm;hầm;dưới lòng đất;tầng ngầm;ngầm
-b2|カメラ||máy ảnh|camera;máy chụp hình;máy chụp ảnh
-b2|けいたいでんわ||điện thoại di động|điện thoại;điện thoại cầm tay;mobile;cell phone
-b2|じしょ||từ điển|dictionary
-b2|でんしじしょ||từ điển điện tử|electronic dictionary
-b2|パソコン||máy tính|máy vi tính;máy tính cá nhân;computer;pc;laptop;máy tính để bàn
-b2|くつ||giày dép|giày;dép;shoes;đôi giày
-b2|けしゴム||cục tẩy|tẩy;gôm;cục gôm;cái tẩy;eraser;gôm tẩy
-b2|ペン||bút mực|bút;pen;cây bút;bút bi;viết;cây viết;bút máy
-b2|トイレットペーパー||giấy vệ sinh|giấy toilet;toilet paper;giấy toa lét;giấy cuộn
-b2|ほん||sách|book;cuốn sách;quyển sách
-b2|あぶら||dầu|dầu ăn;oil;mỡ;dầu mỡ
-b2|ケーキ||bánh ngọt|bánh kem;bánh;cake;bánh gato
-b2|こめ||gạo|rice;lúa gạo
-b2|たまご||trứng|egg;trứng gà
-b2|パン||bánh mì|bread;bánh;bánh mỳ
-b2|みず||nước|nước uống;nước lọc;water
-b2|てんいん||nhân viên cửa hàng|nhân viên bán hàng;nhân viên;người bán hàng;nhân viên cửa tiệm;nhân viên quán
-b2|～屋|や|tiệm ~|cửa hàng ~;tiệm;cửa hàng;quán;tiệm bán ~;nhà ~;hiệu;cửa hiệu
-b2|くつや||tiệm giày|cửa hàng giày;shop giày;tiệm bán giày;hiệu giày;cửa hàng bán giày
-b2|ケーキや||tiệm bánh ngọt|tiệm bánh;cửa hàng bánh ngọt;cửa hàng bánh;tiệm bánh kem;hiệu bánh ngọt;hiệu bánh
-b2|パンや||tiệm bánh mì|cửa hàng bánh mì;hiệu bánh mì;tiệm bán bánh mì;tiệm bánh;lò bánh mì
-b2|かばん||cặp|túi;túi xách;cặp sách;balo;ba lô;bag;cái cặp;cái túi;giỏ xách
-b2|ズボン||quần|quần dài;pants;trousers;quần tây;quần âu
-b2|Ｔシャツ|ティーシャツ|áo thun|áo phông;t-shirt;áo t-shirt;áo tee;tshirt;áo thun ngắn tay
-b2|とけい||đồng hồ|clock;watch;đồng hồ đeo tay;đồng hồ treo tường;đồng hồ báo thức
-b2|イチゴ||dâu tây|dâu;strawberry;trái dâu
-b2|リンゴ||táo|apple;trái táo;táo tây;quả táo
-b2|バナナ||chuối|banana;quả chuối;trái chuối
-b2|えび||tôm|shrimp;prawn;con tôm
-b2|さかな||cá|fish;con cá
-b2|ぶたにく||thịt heo|thịt lợn;pork
-b2|とりにく||thịt gà|chicken;thịt gia cầm
-b2|ぎゅうにく||thịt bò|beef;thịt trâu bò
-b2|やさい||rau|rau củ;rau xanh;vegetable;rau quả;rau củ quả;củ quả
-b2|カレー||cà ri|curry;ca ri;món cà ri;cơm cà ri
-b2|スープ||súp|soup;canh;xúp;nước dùng;canh súp
-b2|おやこどん||cơm gà trứng|oyakodon;cơm gà và trứng;cơm gà phủ trứng;oyako don;cơm cha con;tô cơm gà trứng
-b2|とんかつ||thịt heo chiên xù|tonkatsu;thịt lợn chiên xù;cốt lết;thịt heo chiên giòn;sườn chiên xù;thịt chiên xù;thịt heo cốt lết;thịt lợn cốt lết
-b2|ハンバーグ||hamburger|hamburg;hamburg steak;thịt viên;thịt bò xay;thịt băm viên;bò viên;chả bò;bánh hamburger;bánh thịt bò
-b2|ごはん||cơm|cơm trắng;bữa ăn;bữa cơm;rice;cơm chín
-b2|ライス||cơm|cơm trắng;rice;đĩa cơm;phần cơm
-b2|（お）ちゃ|おちゃ|trà|trà xanh;tea;chè;nước trà;trà nhật;trà nóng
-b2|こうちゃ||hồng trà|trà đen;black tea;trà tây;trà túi lọc;trà hồng
-b2|コーヒー||cà phê|cafe;coffee;cà fê;caphe;cà phê đen;cà phê nóng
-b2|ジュース||nước ép|nước trái cây;nước hoa quả;juice;nước ngọt;nước quả;nước ép trái cây;nước giải khát
-b2|ビール||bia|beer;bia hơi;bia tươi
-b2|ワイン||rượu vang|wine;rượu nho;vang;vang đỏ;rượu vang đỏ
-b2|ドイツ||Đức|germany;nước đức;đức quốc
-b2|フランス||Pháp|france;nước pháp;pháp quốc
-b2|さいふ||ví|ví tiền;bóp;bóp tiền;wallet;ví da;cái ví
-b2|えいご||tiếng Anh|english;anh ngữ;anh văn;môn tiếng anh;môn anh văn
+b2-mall|インフォメーション||quầy thông tin|thông tin;information;quầy hướng dẫn;quầy tư vấn;quầy tiếp tân;quầy giải đáp
+b2-mall|ATM|エーティーエム|cây ATM|atm;máy atm;máy rút tiền;máy rút tiền tự động
+b2-mall|エスカレーター||thang cuốn|thang cuốn tự động;escalator;thang chạy
+b2-mall|エレベーター||thang máy|elevator;lift
+b2-mall|トイレ||toilet|nhà vệ sinh;wc;phòng vệ sinh;toa lét;cầu tiêu;nhà xí
+b2-mall|レジ||thu ngân|quầy thu ngân;quầy tính tiền;máy tính tiền;thanh toán;register;người thu ngân;quầy thanh toán
+b2-mall|スーパー||siêu thị|supermarket
+b2-mall|100えんショップ|ひゃくえんショップ|cửa hàng đồng giá 100 yên|cửa hàng 100 yên;cửa hàng đồng giá;tiệm 100 yên;đồng giá 100 yên;shop 100 yên;cửa hàng một trăm yên
+b2-mall|レストラン||nhà hàng|restaurant;quán ăn;tiệm ăn
+b2-mall|きっさてん||quán cà phê|quán cafe;tiệm cà phê;quán nước;cafe;tiệm cafe;quán giải khát
+b2-mall|きつえんじょ||nơi hút thuốc|khu hút thuốc;chỗ hút thuốc;phòng hút thuốc;khu vực hút thuốc;hút thuốc;smoking
+b2-mall|ちか||dưới mặt đất|tầng hầm;hầm;dưới lòng đất;tầng ngầm;ngầm
+b2-tech|カメラ||máy ảnh|camera;máy chụp hình;máy chụp ảnh
+b2-tech|けいたいでんわ||điện thoại di động|điện thoại;điện thoại cầm tay;mobile;cell phone
+b2-tech|じしょ||từ điển|dictionary
+b2-tech|でんしじしょ||từ điển điện tử|electronic dictionary
+b2-tech|パソコン||máy tính|máy vi tính;máy tính cá nhân;computer;pc;laptop;máy tính để bàn
+b2-wear|くつ||giày dép|giày;dép;shoes;đôi giày
+b2-tech|けしゴム||cục tẩy|tẩy;gôm;cục gôm;cái tẩy;eraser;gôm tẩy
+b2-tech|ペン||bút mực|bút;pen;cây bút;bút bi;viết;cây viết;bút máy
+b2-wear|トイレットペーパー||giấy vệ sinh|giấy toilet;toilet paper;giấy toa lét;giấy cuộn
+b2-tech|ほん||sách|book;cuốn sách;quyển sách
+b2-basic|あぶら||dầu|dầu ăn;oil;mỡ;dầu mỡ
+b2-basic|ケーキ||bánh ngọt|bánh kem;bánh;cake;bánh gato
+b2-basic|こめ||gạo|rice;lúa gạo
+b2-basic|たまご||trứng|egg;trứng gà
+b2-basic|パン||bánh mì|bread;bánh;bánh mỳ
+b2-drink|みず||nước|nước uống;nước lọc;water
+b2-shop|てんいん||nhân viên cửa hàng|nhân viên bán hàng;nhân viên;người bán hàng;nhân viên cửa tiệm;nhân viên quán
+b2-shop|～屋|や|tiệm ~|cửa hàng ~;tiệm;cửa hàng;quán;tiệm bán ~;nhà ~;hiệu;cửa hiệu
+b2-shop|くつや||tiệm giày|cửa hàng giày;shop giày;tiệm bán giày;hiệu giày;cửa hàng bán giày
+b2-shop|ケーキや||tiệm bánh ngọt|tiệm bánh;cửa hàng bánh ngọt;cửa hàng bánh;tiệm bánh kem;hiệu bánh ngọt;hiệu bánh
+b2-shop|パンや||tiệm bánh mì|cửa hàng bánh mì;hiệu bánh mì;tiệm bán bánh mì;tiệm bánh;lò bánh mì
+b2-wear|かばん||cặp|túi;túi xách;cặp sách;balo;ba lô;bag;cái cặp;cái túi;giỏ xách
+b2-wear|ズボン||quần|quần dài;pants;trousers;quần tây;quần âu
+b2-wear|Ｔシャツ|ティーシャツ|áo thun|áo phông;t-shirt;áo t-shirt;áo tee;tshirt;áo thun ngắn tay
+b2-wear|とけい||đồng hồ|clock;watch;đồng hồ đeo tay;đồng hồ treo tường;đồng hồ báo thức
+b2-ingr|イチゴ||dâu tây|dâu;strawberry;trái dâu
+b2-ingr|リンゴ||táo|apple;trái táo;táo tây;quả táo
+b2-ingr|バナナ||chuối|banana;quả chuối;trái chuối
+b2-ingr|えび||tôm|shrimp;prawn;con tôm
+b2-ingr|さかな||cá|fish;con cá
+b2-ingr|ぶたにく||thịt heo|thịt lợn;pork
+b2-ingr|とりにく||thịt gà|chicken;thịt gia cầm
+b2-ingr|ぎゅうにく||thịt bò|beef;thịt trâu bò
+b2-ingr|やさい||rau|rau củ;rau xanh;vegetable;rau quả;rau củ quả;củ quả
+b2-dish|カレー||cà ri|curry;ca ri;món cà ri;cơm cà ri
+b2-dish|スープ||súp|soup;canh;xúp;nước dùng;canh súp
+b2-dish|おやこどん||cơm gà trứng|oyakodon;cơm gà và trứng;cơm gà phủ trứng;oyako don;cơm cha con;tô cơm gà trứng
+b2-dish|とんかつ||thịt heo chiên xù|tonkatsu;thịt lợn chiên xù;cốt lết;thịt heo chiên giòn;sườn chiên xù;thịt chiên xù;thịt heo cốt lết;thịt lợn cốt lết
+b2-dish|ハンバーグ||hamburger|hamburg;hamburg steak;thịt viên;thịt bò xay;thịt băm viên;bò viên;chả bò;bánh hamburger;bánh thịt bò
+b2-basic|ごはん||cơm|cơm trắng;bữa ăn;bữa cơm;rice;cơm chín
+b2-basic|ライス||cơm|cơm trắng;rice;đĩa cơm;phần cơm
+b2-drink|（お）ちゃ|おちゃ|trà|trà xanh;tea;chè;nước trà;trà nhật;trà nóng
+b2-drink|こうちゃ||hồng trà|trà đen;black tea;trà tây;trà túi lọc;trà hồng
+b2-drink|コーヒー||cà phê|cafe;coffee;cà fê;caphe;cà phê đen;cà phê nóng
+b2-drink|ジュース||nước ép|nước trái cây;nước hoa quả;juice;nước ngọt;nước quả;nước ép trái cây;nước giải khát
+b2-drink|ビール||bia|beer;bia hơi;bia tươi
+b2-drink|ワイン||rượu vang|wine;rượu nho;vang;vang đỏ;rượu vang đỏ
+b2-lang|ドイツ||Đức|germany;nước đức;đức quốc
+b2-lang|フランス||Pháp|france;nước pháp;pháp quốc
+b2-wear|さいふ||ví|ví tiền;bóp;bóp tiền;wallet;ví da;cái ví
+b2-lang|えいご||tiếng Anh|english;anh ngữ;anh văn;môn tiếng anh;môn anh văn
 `;
 
 /* ---------- kana -> romaji ---------- */
@@ -398,7 +421,7 @@ const wrongCount = it => (stats[it.id] && stats[it.id].w) || 0;
 
 /* ---------- trạng thái ---------- */
 const state = {
-  view: 'setup', sel: new Set(SETS.map(s => s.id)), limit: 20, romaji: true, weakOnly: false,
+  view: 'setup', sel: new Set([SETS[0].id]), limit: 0, romaji: true, weakOnly: false,
   queue: [], i: 0, phase: 'ask', cur: null, log: [], confirmReset: false, q: ''
 };
 const $ = s => document.querySelector(s);
@@ -407,30 +430,37 @@ const lenOf = s => [...s].length;
 const sizeCls = s => { const n = lenOf(s); return n <= 4 ? 'l1' : n <= 8 ? 'l2' : n <= 12 ? 'l3' : 'l4'; };
 function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function pool() { return ITEMS.filter(it => it.sets.some(s => state.sel.has(s)) && (!state.weakOnly || wrongCount(it) > 0)); }
-const setName = id => (SETS.find(s => s.id === id) || {}).n || id;
+const setName = id => { const s = SETS.find(x => x.id === id); if (!s) return id; return (LESSONS.find(l => l.id === s.l) || {}).n + ' · ' + s.n; };
 
 /* ---------- màn chọn ---------- */
 function viewSetup() {
   const p = pool(), n = state.limit ? Math.min(p.length, state.limit) : p.length;
   const weakTotal = ITEMS.filter(it => wrongCount(it) > 0).length;
-  const cards = SETS.map(s => {
-    const c = ITEMS.filter(it => it.sets.includes(s.id)).length;
-    return `<button type="button" class="set" id="set-${s.id}" data-act="toggle-set" data-s="${s.id}" aria-pressed="${state.sel.has(s.id)}">
-      <span class="sn">${esc(s.n)}</span><span class="sd">${esc(s.d)}</span><span class="sc">${c} từ</span></button>`;
+  const cards = LESSONS.map(L => {
+    const ts = SETS.filter(s => s.l === L.id);
+    const all = ts.every(s => state.sel.has(s.id));
+    const btns = ts.map(s => {
+      const c = ITEMS.filter(it => it.sets.includes(s.id)).length;
+      return `<button type="button" class="set" id="set-${s.id}" data-act="toggle-set" data-s="${s.id}" aria-pressed="${state.sel.has(s.id)}">
+        <span class="sn">${esc(s.n)}</span><span class="sc">${c} từ</span></button>`;
+    }).join('');
+    return `<div class="lesson"><div class="lh"><h2>${esc(L.n)}</h2>
+      <button type="button" class="btn ghost small" id="all-${L.id}" data-act="toggle-lesson" data-l="${L.id}">${all ? 'Bỏ chọn cả bài' : 'Chọn cả bài'}</button></div>
+      <div class="sets">${btns}</div></div>`;
   }).join('');
   const lim = [[10, '10 câu'], [20, '20 câu'], [30, '30 câu'], [50, '50 câu'], [0, 'Tất cả']]
     .map(o => `<option value="${o[0]}" ${state.limit === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('');
   return `<section>
     <h1 style="font-size:28px;letter-spacing:-.02em">Luyện từ vựng</h1>
-    <p class="lede">Hiện một từ tiếng Nhật kèm phiên âm. Bạn gõ nghĩa tiếng Việt rồi nhấn Enter. Đúng thì báo đúng, sai thì hiện nghĩa đúng.</p>
-    <div class="sets">${cards}</div>
+    <p class="lede">Chọn một hoặc vài cụm chủ đề nhỏ để học (mỗi cụm khoảng 5 đến 15 từ). Trang hiện từ tiếng Nhật kèm phiên âm, bạn gõ nghĩa rồi nhấn Enter.</p>
+    ${cards}
     <div class="opts card" style="margin-top:18px">
       <label class="check"><input type="checkbox" id="o-romaji" data-opt="romaji" ${state.romaji ? 'checked' : ''}><span>Hiện phiên âm romaji<span class="sub"><br>ví dụ: がっこう → gakkou</span></span></label>
       <label class="check"><input type="checkbox" id="o-weak" data-opt="weak" ${state.weakOnly ? 'checked' : ''} ${weakTotal ? '' : 'disabled'}><span>Chỉ luyện từ hay sai<span class="sub"><br>${weakTotal ? weakTotal + ' từ từng sai' : 'Chưa có từ nào sai'}</span></span></label>
       <div><label class="eyebrow" for="o-limit">Số câu mỗi lượt</label><br><select id="o-limit" data-opt="limit">${lim}</select></div>
       <div class="startrow">
         <button type="button" class="btn" id="start" data-act="start" ${n === 0 ? 'disabled' : ''}>Bắt đầu (${n} từ)</button>
-        <span class="warn" id="warn">${n === 0 ? 'Chưa có từ nào khớp lựa chọn.' : ''}</span>
+        <span class="warn" id="warn">${n === 0 ? 'Hãy chọn ít nhất một cụm chủ đề.' : ''}</span>
       </div>
     </div>
   </section>`;
@@ -551,6 +581,7 @@ document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
   const act = el.dataset.act;
   if (act === 'toggle-set') { const s = el.dataset.s; state.sel.has(s) ? state.sel.delete(s) : state.sel.add(s); focusId = el.id; render(); }
+  else if (act === 'toggle-lesson') { const ts = SETS.filter(s => s.l === el.dataset.l); const all = ts.every(s => state.sel.has(s.id)); ts.forEach(s => all ? state.sel.delete(s.id) : state.sel.add(s.id)); focusId = el.id; render(); }
   else if (act === 'start') { const p = shuffle(pool().slice()); startQuiz(state.limit ? p.slice(0, state.limit) : p); }
   else if (act === 'check') submitAnswer();
   else if (act === 'next') nextQ();
